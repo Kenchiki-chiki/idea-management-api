@@ -12,7 +12,6 @@ class IdeaForm
     return if invalid?
 
     ActiveRecord::Base.transaction do
-      binding.pry
       category = Category.find_or_create_by!(name: category_name)
       idea = Idea.new(body: body, category: category)
       idea.save!

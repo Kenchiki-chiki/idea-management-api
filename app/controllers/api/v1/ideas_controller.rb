@@ -1,9 +1,21 @@
 class Api::V1::IdeasController < ApplicationController
 
-  
+  def index
+    binding.pry
+    if params[:category_name]
+      category = Category.find_by!(name: category_name)
+    
+      ideas = category.ideas.all
+      rescue ActiveRecord::RecordInvalid
+        render status: 422, json: { status: 422 }
+      end
+    else
+      ideas = Idea.all
+    end
+    render json: :ideas, status: :created
+  end
 
   def create
-    binding.pry
     idea = IdeaForm.new(idea_params)
   
     if idea.save
@@ -12,9 +24,6 @@ class Api::V1::IdeasController < ApplicationController
       render status: 422, json: { status: 422 }
     end
   end
-
-  
-
 
 
   private

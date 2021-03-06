@@ -1,23 +1,17 @@
 class Api::V1::IdeasController < ApplicationController
 
   def index
-    # binding.pry
     if params[:category_name]
-      # Categoryのテーブルから一致するnameを取得
       category = Category.find_by!(name: params[:category_name])
     
-      # 該当のcategoryと紐づくアイデアを取得
       ideas = category.ideas.all
-      # rescue ActiveRecord::RecordInvalid
-      #   render status: 404, json: { status: 404 }
-      # end
+      group_json(ideas)
     else
-      # アイデアすべてを取得
       ideas = Idea.all
+      group_json(ideas)
     end
-    # binding.pry
-    # render json: ideas, status: :created
-    render json: {id: category.id, category: category.name, body: ideas.first.body} , status: :created
+
+    render json: ideas , status: :ok
   end
 
   def create
@@ -35,5 +29,12 @@ class Api::V1::IdeasController < ApplicationController
   
   def idea_params
     params.permit(:category_name, :body)
+  end
+end
+
+def group_json(ideas)
+  ideas = ideas.map do |idea|
+    category = idea.category
+    {id: category.id, category: category.name, body: idea.body}
   end
 end

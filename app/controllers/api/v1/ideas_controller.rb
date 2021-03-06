@@ -1,18 +1,17 @@
 class Api::V1::IdeasController < ApplicationController
 
   def index
-    binding.pry
     if params[:category_name]
-      category = Category.find_by!(name: category_name)
+      category = Category.find_by!(name: params[:category_name])
     
       ideas = category.ideas.all
-      rescue ActiveRecord::RecordInvalid
-        render status: 422, json: { status: 422 }
-      end
+      group_json(ideas)
     else
       ideas = Idea.all
+      group_json(ideas)
     end
-    render json: :ideas, status: :created
+
+    render json: ideas , status: :ok
   end
 
   def create
@@ -30,5 +29,12 @@ class Api::V1::IdeasController < ApplicationController
   
   def idea_params
     params.permit(:category_name, :body)
+  end
+end
+
+def group_json(ideas)
+  ideas = ideas.map do |idea|
+    category = idea.category
+    {id: category.id, category: category.name, body: idea.body}
   end
 end

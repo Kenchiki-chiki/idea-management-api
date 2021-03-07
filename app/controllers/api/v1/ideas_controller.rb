@@ -5,13 +5,13 @@ class Api::V1::IdeasController < ApplicationController
       category = Category.find_by!(name: params[:category_name])
     
       ideas = category.ideas.all
-      group_json(ideas)
+      res_ideas = group_json(ideas)
     else
       ideas = Idea.all
-      group_json(ideas)
+      res_ideas = group_json(ideas)
     end
 
-    render json: ideas , status: :ok
+    render json: res_ideas , status: :ok
   end
 
   def create
@@ -33,8 +33,9 @@ class Api::V1::IdeasController < ApplicationController
 end
 
 def group_json(ideas)
-  ideas = ideas.map do |idea|
+  ideas.map do |idea|
     category = idea.category
+    # binding.pry
     {id: category.id, category: category.name, body: idea.body}
   end
 end

@@ -25,7 +25,7 @@ RSpec.describe "Ideas", type: :request do
       expect(response.status).to eq(422)
     end
 
-    it 'creates a category when there is no body' do
+    it 'does not creates a category when there is no body' do
       category = FactoryBot.create(:category, name:'App')      
         post api_v1_ideas_path, params: {
             category_name: "App",
@@ -47,5 +47,13 @@ RSpec.describe "Ideas", type: :request do
         expect(response).to have_http_status(:success)
     end
 
+    it 'get request 404 when the category name no exists' do
+      category = FactoryBot.create(:category, name:'Soft')
+      expect {
+          get api_v1_ideas_path, params: {
+            category_name: "App",
+        }
+      }.to raise_error(ActiveRecord::RecordNotFound)
+    end    
   end
 end

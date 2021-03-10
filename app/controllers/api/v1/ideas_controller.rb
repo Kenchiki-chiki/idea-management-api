@@ -1,14 +1,10 @@
 class Api::V1::IdeasController < ApplicationController
+  before_action :set_ideas, only: [:index]
 
   def index
-    if params[:category_name]
-      category = Category.find_by!(name: params[:category_name])
-    
-      ideas = category.ideas.all
-      res_ideas = group_json(ideas)
-    else
-      ideas = Idea.all
-      res_ideas = group_json(ideas)
+    res_ideas = @ideas.map do |idea|
+      category = idea.category
+      {id: category.id, category: category.name, body: idea.body}
     end
 
     render json: res_ideas , status: :ok
@@ -30,12 +26,14 @@ class Api::V1::IdeasController < ApplicationController
   def idea_params
     params.permit(:category_name, :body)
   end
-end
 
-def group_json(ideas)
-  ideas.map do |idea|
-    category = idea.category
-    # binding.pry
-    {id: category.id, category: category.name, body: idea.body}
+  def set_ideas
+    if params[:category_name]
+      category = Category.find_by!(name: params[:category_name])    
+      @ideas = category.ideas.all
+    else
+      @ideas = Idea.all
+    end
   end
+
 end

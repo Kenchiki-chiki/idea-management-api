@@ -16,6 +16,10 @@ RSpec.describe "Ideas", type: :request do
       expect(response).to have_http_status(:success)
     end
 
+    it "get request successfully" do
+      get api_v1_ideas_path   
+      expect(response).to have_http_status(:ok)
+    end
 
 
   end

@@ -54,6 +54,51 @@ RSpec.describe "Ideas", type: :request do
             category_name: "App",
         }
       }.to raise_error(ActiveRecord::RecordNotFound)
-    end    
+    end
+
+    it 'get request when category_name is not specified' do
+      category = FactoryBot.create(:category, name:'App', id: 1)
+      category2 = FactoryBot.create(:category, name:'Soft', id: 2)
+      idea = Idea.new(body:'TestTool', category: category)
+      idea2 = Idea.new(body:'TestSoft', category: category2)
+      idea.save!     
+      idea2.save!
+      get api_v1_ideas_path
+      expect(JSON.parse(response.body)).to eq(
+        [
+          { 
+            'id' => 1,
+            'category' => 'App',
+            'body' => 'TestTool'
+           },
+           { 
+            'id' => 2,
+            'category' => 'Soft',
+            'body' => 'TestSoft'
+           }
+        ]
+      )
+    end
+
+    it 'get request when category_name is specified' do
+      category = FactoryBot.create(:category, name:'App', id: 3)
+      category2 = FactoryBot.create(:category, name:'Soft', id: 4)
+      idea = Idea.new(body:'TestTool', category: category)
+      idea2 = Idea.new(body:'TestSoft', category: category2)
+      idea.save!     
+      idea2.save!
+      get api_v1_ideas_path , params: {
+         category_name: 'App' 
+        }
+      expect(JSON.parse(response.body)).to eq(
+        [
+          { 
+            'id' => 3,
+            'category' => 'App',
+            'body' => 'TestTool'
+            }
+        ]
+      )
+    end
   end
 end
